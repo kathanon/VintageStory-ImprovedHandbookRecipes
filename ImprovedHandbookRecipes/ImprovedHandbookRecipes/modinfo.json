@@ -1,0 +1,14 @@
+{
+  "type": "code",
+  "modid": "improvedhandbookrecipes",
+  "name": "Improved Handbook Recipes",
+  "authors": [
+    "Kathanon"
+  ],
+  "description": "Makes recipes easier to use from the handbook, by letting you scroll freely among variants, adding auto-fill buttons, and displaying what ingredients are not consumed.",
+  "version": "1.0.0",
+  "side": "Client",
+  "dependencies": {
+    "game": ""
+  }
+}
