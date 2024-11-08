@@ -122,6 +122,7 @@ public class FillGridButton : ButtonRTC {
         
         // Match up grid contents to recipe and empty non-matching
         if (recipe.Shapeless) {
+            input = input.ToArray();
             var newInput = ingredients
                 .Select(x => PullFirst(input, y => x.SatisfiesAsIngredient(y?.Itemstack, false)))
                 .ToArray();
