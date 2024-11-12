@@ -124,7 +124,7 @@ public class FillGridButton : ButtonRTC {
         if (recipe.Shapeless) {
             input = input.ToArray();
             var newInput = ingredients
-                .Select(x => PullFirst(input, y => x.SatisfiesAsIngredient(y?.Itemstack, false)))
+                .Select(x => PullFirst(input, y => x?.SatisfiesAsIngredient(y?.Itemstack, false) ?? false))
                 .ToArray();
             input
                 .Where(x => !x?.Empty ?? false)
