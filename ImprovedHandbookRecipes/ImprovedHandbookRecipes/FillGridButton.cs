@@ -165,7 +165,7 @@ public class FillGridButton : ButtonRTC {
 
         // Determine number of complete sets already present
         int complete = ingredients
-            .Select((x, i) => (x != null) ? input[i].StackSize / x.Quantity : -1)
+            .Select((x, i) => CurrentSets(x, input[i]))
             .Where(x => x >= 0)
             .Min();
         
@@ -187,7 +187,8 @@ public class FillGridButton : ButtonRTC {
             }
 
             foreach (var slot in available) {
-                if (!Satisfies(ingredient, slot?.Itemstack)) continue;
+                if (!Satisfies(ingredient, slot?.Itemstack) 
+                    || !input[i].CanTakeFrom(slot)) continue;
                 if (!remaining.TryGetValue(slot, out int size)) {
                     size = remaining[slot] = slot.Itemstack.StackSize;
                 }
@@ -205,13 +206,19 @@ public class FillGridButton : ButtonRTC {
         // Perform moves
         var player = api.World.Player;
         var manager = player.InventoryManager;
+        bool change = false;
         foreach (var (from, to, n) in ops) {
             ItemStackMoveOperation op = new(api.World, EnumMouseButton.Left, 0, EnumMergePriority.AutoMerge, n);
             op.ActingPlayer = player;
-            SendPacket(manager.TryTransferTo(from, to, ref op));
+            int before = to.StackSize;
+            var packet = manager.TryTransferTo(from, to, ref op);
+            if (to.StackSize > before) {
+                SendPacket(packet);
+                change = true;
+            }
         }
 
-        return true;
+        return change;
 
 
         static T PullFirst<T>(T[] arr, System.Func<T, bool> test) where T : class {
@@ -223,6 +230,12 @@ public class FillGridButton : ButtonRTC {
                 }
             }
             return null;
+        }
+
+        int CurrentSets(GridRecipeIngredient ingr, ItemSlot slot) {
+            if (ingr == null) return -1;
+            if (ingr.IsTool) return (slot.StackSize > 0) ? -1 : 0;
+            return slot.StackSize / ingr.Quantity;
         }
 
         bool SatisfiesAt(int iIngredient, int iInput)
@@ -286,7 +299,7 @@ public class FillGridButton : ButtonRTC {
 
         private readonly string MakeKey() {
             var buf = new StringBuilder();
-            buf.Append(Code);
+            buf.Append(Code.ToString());
             AddArray(buf, include, '[');
             AddArray(buf, exclude, ']');
             return buf.ToString();

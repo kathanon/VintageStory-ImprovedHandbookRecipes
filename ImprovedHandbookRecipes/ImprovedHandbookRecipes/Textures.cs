@@ -17,12 +17,12 @@ public static class Textures {
     }
 
     public class Texture {
-        private readonly string path;
+        private readonly AssetLocation path;
         private BitmapRef bitmap;
         private LoadedTexture texture;
 
         public Texture(string name) {
-            path = $"improvedhandbookrecipes:textures/{name}.png";
+            path = new("improvedhandbookrecipes", $"textures/{name}.png");
             all.Add(this);
         }
 

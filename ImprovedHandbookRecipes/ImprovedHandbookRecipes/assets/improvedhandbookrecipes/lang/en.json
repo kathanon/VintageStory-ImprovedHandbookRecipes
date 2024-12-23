@@ -1,4 +1,5 @@
 {
+  "stackSize":  "\nMax stack size: {0}\n",
   "durability": "\nRecipe will use {0} durability.\n",
   "addone":     "Add items to make one more craft to grid.",
   "addmax":     "Add items to make the maximum amount to grid."

@@ -103,26 +103,30 @@ public static class Handbook_Patch {
         counter += indexChange;
 
         if (counter < 0) {
-            var unnamed = list[index].unnamedIngredients;
-            if (unnamed == null) {
+            var ingredient = (index >= 0 && index < list.Length) ? list[index].unnamedIngredients : null;
+            if (ingredient == null) {
                 counter = 0;
                 return;
             }
-            int[] lengths = unnamed.Values
+            int[] lengths = ingredient.Values
                     .Select(x => x.Length)
                     .ToArray();
-            int prod = 1;
+            bool[] use = new bool[lengths.Length];
             for (int i = 0; i < lengths.Length; i++) {
-                bool use = true;
+                use[i] = true;
                 for (int j = 0; j < i; j++) {
-                    if (lengths[j] % lengths[i] == 0 && lengths[i] % lengths[j] == 0) {
-                        use = false;
+                    if (!use[j]) continue;
+                    if (lengths[j] % lengths[i] == 0) {
+                        use[i] = false;
                         break;
+                    } else if (lengths[i] % lengths[j] == 0) {
+                        use[j] = false;
                     }
                 }
-                if (use)
-                    prod *= lengths[i];
             }
+            int prod = lengths
+                .Where((_, i) => use[i])
+                .Aggregate((x, y) => x * y);
             while (counter < 0) {
                 counter += prod;
             }
@@ -187,6 +191,9 @@ public static class Handbook_Patch {
     [HarmonyPostfix]
     [HarmonyPatch(typeof(CollectibleObject), nameof(CollectibleObject.GetHeldItemInfo))]
     public static void GetHeldItemInfo_post(StringBuilder dsc, CollectibleObject __instance) {
+        if (!__instance.IsLiquid()) {
+            dsc.Append(Lang.Get("improvedhandbookrecipes:stackSize", __instance.MaxStackSize));
+        }
         if (durabilityCost > 0 && ReferenceEquals(__instance, currentObject)) {
             dsc.Append(Lang.Get("improvedhandbookrecipes:durability", durabilityCost));
         }
@@ -223,3 +230,4 @@ public static class Handbook_Patch {
         }
     }
 }
+// TODO: show item stack size
