@@ -219,6 +219,7 @@ public static class Handbook_Patch {
     [HarmonyPostfix]
     [HarmonyPatch(typeof(CollectibleBehaviorHandbookTextAndExtraInfo), "addCreatedByInfo")]
     public static void CreatedByInfo(List<RichTextComponentBase> components) {
+        if (components == null) return;
         for (int i = 0; i < components.Count; i++) {
             var component = components[i];
             if (component is SlideshowGridRecipeTextComponent prev) {
@@ -230,4 +231,3 @@ public static class Handbook_Patch {
         }
     }
 }
-// TODO: show item stack size
